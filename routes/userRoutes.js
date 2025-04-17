@@ -3,7 +3,7 @@ import { getUsers, postUser, putUser, deleteUser } from '../controllers/userCont
 
 const userRouter = express.Router();
 
-userRouter.get('/signin/', getUsers);
+userRouter.post('/signin/', getUsers);
 
 userRouter.post('/signup/', postUser);
 

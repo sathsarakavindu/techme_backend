@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import userRouter from './routes/userRoutes.js';
 import mongoose from 'mongoose';
 import 'dotenv/config'
+import vehicleRouter from './routes/vehicleRoutes.js';
 
 const app = express();
 
@@ -22,6 +23,7 @@ catch(()=>{
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/vehicle', vehicleRouter)
 
 app.listen(5000, (req, res)=>{
     console.log("Server is running on port 5000");
