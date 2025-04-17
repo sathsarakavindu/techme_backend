@@ -5,7 +5,9 @@ import jwt from 'jsonwebtoken';
 
 export async function getUsers(req, res){
 
-  try{ const { email, password } = req.body;    
+  try{ 
+    const { email, password } = req.body;  
+    console.log(email, password);  
 
   const user = await User.findOne({email: email});
   if(!user){
