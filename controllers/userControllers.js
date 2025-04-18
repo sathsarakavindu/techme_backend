@@ -33,7 +33,7 @@ catch(e){
 export async function postUser(req, res){
 
     try{
-        const { email, password} = req.body;
+        const { name, email, password} = req.body;
          const existingUser = await User.findOne({ email });
          if(existingUser){
            return res.status(400).json({message: "User already exists"});
@@ -41,6 +41,7 @@ export async function postUser(req, res){
          else{
             const hashedPassword = await bcryptjs.hash(password, 8);
             let user = new User({
+                name: name,
                 email: email,
                 password: hashedPassword
             });
