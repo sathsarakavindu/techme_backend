@@ -5,7 +5,7 @@ const userRouter = express.Router();
 
 userRouter.post('/signin/', getUsers);
 
-userRouter.post('/signup/', postUser);
+userRouter.post('/register/', postUser);
 
 userRouter.put('/update/', putUser);
 

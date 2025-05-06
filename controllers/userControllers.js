@@ -33,7 +33,8 @@ catch(e){
 export async function postUser(req, res){
 
     try{
-        const { name, email, password} = req.body;
+        const { name, email, password, contact_no, nic, address, account_type} = req.body;
+        console.log(name, email , password);
          const existingUser = await User.findOne({ email });
          if(existingUser){
            return res.status(400).json({message: "User already exists"});
@@ -43,14 +44,27 @@ export async function postUser(req, res){
             let user = new User({
                 name: name,
                 email: email,
-                password: hashedPassword
+                password: hashedPassword,
+                contact_no: contact_no,
+                nic: nic,
+                address: address,
+                account_type: account_type
             });
 
-          await user.save();
+          await user.save().
+          then((results)=>{
             res.status(200).json({
                 message: "User created successfully!",
-                email: email
+                result: results
             });
+          }).
+          catch((error)=>{
+            res.status(404).json({
+                message: "User can't be created!",
+                error: error
+            });
+          });
+           
          }
     
     }
