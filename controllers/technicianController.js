@@ -59,14 +59,23 @@ export async function signInTechnician(req, res){
      await Technician.findOne({email: email}).
     then((result)=>{
       if(result != null){
+
+        const payload = {
+          name: result.name,
+          email: result.email,
+          contact_no: result.contact_no,
+          nic: result.nic,
+          address: result.address,
+          account_type: result.account_type,
+        };
         
         const isPasswordValid = bcrypt.compareSync(password, result.password);
         if(isPasswordValid){
-//const token = jwt.sign(result, secret_key, { expiresIn: "1h"});
+         const token = jwt.sign(payload, secret_key, { expiresIn: "10h"});
          return   res.status(200).json({
             message: "Successfully Login!", 
             result: result,
-            //token: token,
+            token: token,
           });
         }
         else{
