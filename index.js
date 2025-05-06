@@ -4,6 +4,7 @@ import userRouter from './routes/userRoutes.js';
 import mongoose from 'mongoose';
 import 'dotenv/config'
 import vehicleRouter from './routes/vehicleRoutes.js';
+import technicianRoute from './routes/technicianRoutes.js';
 
 const app = express();
 
@@ -23,7 +24,8 @@ catch(()=>{
 });
 
 app.use('/api/users', userRouter);
-app.use('/api/vehicle', vehicleRouter)
+app.use('/api/technician', technicianRoute);
+app.use('/api/vehicle', vehicleRouter);
 
 app.listen(5000, (req, res)=>{
     console.log("Server is running on port 5000");
