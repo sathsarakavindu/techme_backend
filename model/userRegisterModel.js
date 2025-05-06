@@ -19,6 +19,22 @@ const userSchema = new mongoose.Schema({
     "password": {
         type: String,
         required: true,
+    },
+    "contact_no":{
+        type:String,
+        required: true
+    },
+    "nic":{
+        type: String,
+        required:true,
+    },
+    "address":{
+        type:String,
+        required:true
+    },
+    "account_type":{
+        required:true,
+        type:String
     }
 });
 
