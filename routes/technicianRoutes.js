@@ -1,10 +1,10 @@
 import express from 'express';
-import { deleteTechnician, getTechnician, postTechnical, putTechnician } from '../controllers/technicianController';
+import { deleteTechnician, signInTechnician, postTechnical, putTechnician } from '../controllers/technicianController.js';
 
 const technicianRoute = express.Router();
 
 technicianRoute.post('/register/', postTechnical);
-technicianRoute.get('/signin/', getTechnician);
+technicianRoute.post('/signin/', signInTechnician);
 technicianRoute.put('/update/', putTechnician);
 technicianRoute.delete('/delete/', deleteTechnician);
 

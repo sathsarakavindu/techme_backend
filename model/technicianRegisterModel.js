@@ -22,7 +22,7 @@ const technicianSchema = new mongoose.Schema({
         required: true,
     },
     "contact_no":{
-        type:String,
+        type: String,
         required: true
     },
     "nic":{
@@ -39,6 +39,6 @@ const technicianSchema = new mongoose.Schema({
     }
 });
 
-const Technician = new mongoose.Model('technician', technicianSchema);
+const Technician =  mongoose.model('technician', technicianSchema);
 
 export default Technician;
