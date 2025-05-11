@@ -28,7 +28,7 @@ catch(e){
     res.status(500).json({
         error: e.message
     });
-}
+ }
 }
 export async function postUser(req, res){
 
@@ -75,6 +75,55 @@ export async function postUser(req, res){
     }
 
 }   
+
+export async function changePassword(req, res){
+    try{
+           const { user_email, current_password, new_password} = req.body;
+            await User.findOne({ email: user_email}).then(async (results)=>{
+if(results != null){
+    const isMatch = await bcryptjs.compare(current_password, results.password);
+
+    if(isMatch){
+        const hashedPassword = await bcryptjs.hash(new_password, 8);
+    await User.updateOne({password: hashedPassword}).
+        then((results)=>{
+    res.status(200).json({
+        message: "Password changed successfully",
+        result: results
+    });
+        }).catch((error)=>{
+          res.status(400).json({
+          message: "Password can't be changed",
+          error: error
+        });
+      });
+    }
+    else{
+        console.log("Incorrect password");
+        res.status(400).json({
+            message: "Incorrect password",
+            result: results
+        });
+    }
+}
+else{
+    console.log("Incorrect password");
+res.status(400).json({
+    message: "Incorrect password",
+    result: results
+});
+}
+
+            }).catch((err)=>{
+res.status(500).json({message: "change password error", error: err.toString()});
+            });
+
+    }
+    catch(e){
+
+    }
+}
+
 
 export async function deleteUser(req, res){
 
