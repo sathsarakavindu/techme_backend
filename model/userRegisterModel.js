@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
     "account_type":{
         required:true,
         type:String
+    },
+    "otp":{
+        required: false,
+        type: String,
+        default: "0000"
     }
 });
 
