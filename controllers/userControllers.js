@@ -2,6 +2,10 @@
 import User from "../model/userRegisterModel.js";
 import bcryptjs from "bcryptjs";
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export async function getUsers(req, res){
 
@@ -161,3 +165,131 @@ export async function putUser(req, res){
         res.json({error: error});
     });
 }   
+
+export async function sentOTPToUser(req, res){
+
+  const {registered_email} = req.body;
+
+  try{
+
+  await User.findOne({email: registered_email}).
+  then((user)=>{
+       if(user != null){
+
+      const transporter = nodemailer.createTransport({
+      service: "gmail",  
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+             user: process.env.SERVICE_EMAIL,
+             pass: process.env.SERVICE_EMAIL_PASSWORD,
+            },
+      });
+     const otp = Math.floor(1000 + Math.random() * 9000);
+       const message = {
+                   from: process.env.EMAIL,
+                   to: registered_email,
+                   subject: "Validate OTP",
+                   text: "Your OTP code is " + otp
+          }
+
+       transporter.sendMail(message, (err, info)=>{
+
+      if(err){
+        console.log(err);
+      }
+      else{
+        console.log(info);
+
+        // res.status(200).json({
+        //   message: "OTP sent successfully",
+        //   otp: otp
+        // });
+
+        User.findOneAndUpdate({email: registered_email}, {otp: otp}, {new: true}).
+        then((result)=>{
+          res.status(200).json({
+            message: "OTP sent successfully",
+            result: result
+          });
+        }).
+        catch((error)=>{
+          res.status(400).json({
+            message: "OTP can't be sent",
+            error: error
+          });
+        });
+
+      }
+    });
+
+
+       }
+       else{
+        res.status(400).json({message: "Invalid Email"});
+       }
+
+  });
+
+    }
+  catch(e){
+    console.log(`OTP sending error is ${e.toString()}`);
+      res.status(500).json({
+        message: "OTP can't be sent!",
+        error: e.toString()
+      });
+  }
+
+}
+
+export async function checkOTPValidation(req, res){
+
+    try{
+         const {sent_otp} = req.body;
+        //  const hashedPassword = await bcryptjs.hash(new_password, 8);
+
+         await User.findOne({otp: sent_otp}).
+       then((results)=>{
+           if(results != null){
+               res.status(200).json({
+               message: "OTP is correct!"
+               });
+           }
+           else{
+              res.status(400).json({
+               message: "OTP is incorrect!"
+               });
+           }
+       })
+
+    }
+    catch(e){
+
+    }
+}
+
+export async function forgotPasswordUpdate(req, res){
+
+     try{
+            const {new_password, otp} = req.body;
+            const hashedPassword = await bcryptjs.hash(new_password, 8);
+            User.findOneAndUpdate({otp: otp}, {password: hashedPassword}, {new: true}).
+            then((results)=>{
+                res.status(200).json({
+                    message: "Password updated successfully",
+                    result: results
+                });
+            }).
+            catch((error)=>{
+                res.status(400).json({
+                    message: "Password can't be updated",
+                    error: error
+                });
+            });
+     }
+     catch(e){
+
+     }
+
+}
