@@ -1,11 +1,12 @@
 import express from 'express';
-import { deleteTechnician, signInTechnician, postTechnical, putTechnician } from '../controllers/technicianController.js';
+import { signInTechnician, postTechnical, sentOTPToTechnician, checkOTPValidationForTechnician, changePasswordTechnician, forgotPasswordUpdateForTechnician } from '../controllers/technicianController.js';
 
 const technicianRoute = express.Router();
 
 technicianRoute.post('/register/', postTechnical);
 technicianRoute.post('/signin/', signInTechnician);
-technicianRoute.put('/update/', putTechnician);
-technicianRoute.delete('/delete/', deleteTechnician);
-
+technicianRoute.post('/forgot-password/', sentOTPToTechnician);
+technicianRoute.post('/check-otp/', checkOTPValidationForTechnician);
+technicianRoute.post('/change-password/', changePasswordTechnician);
+technicianRoute.put('/update-forgot-password/', forgotPasswordUpdateForTechnician);
 export default technicianRoute;

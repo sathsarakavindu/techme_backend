@@ -26,7 +26,7 @@ export async function getUsers(req, res){
   }
 
   const token = jwt.sign({ id:user._id }, "passwordKey");
-  res.json({ token, ...user._doc});
+  res.status(200).json({ token, ...user._doc});
 }
 catch(e){
     res.status(500).json({
@@ -274,7 +274,7 @@ export async function forgotPasswordUpdate(req, res){
      try{
             const {new_password, otp} = req.body;
             const hashedPassword = await bcryptjs.hash(new_password, 8);
-            User.findOneAndUpdate({otp: otp}, {password: hashedPassword}, {new: true}).
+           await User.findOneAndUpdate({otp: otp}, {password: hashedPassword}, {new: true}).
             then((results)=>{
                 res.status(200).json({
                     message: "Password updated successfully",

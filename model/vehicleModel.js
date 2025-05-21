@@ -2,6 +2,25 @@ import mongoose from "mongoose";
 
 const vehicleSchema = new mongoose.Schema({
 
+    name:{
+        required: true,
+        type: String,
+    },
+
+    email:{
+        required: true,
+        type: String,
+    },
+
+    contact_no:{
+        required: true,
+        type: String,
+    },
+    nic:{
+        required: true,
+        type: String,
+    },
+
     image_url:{
         type: String,
         default: "https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-blank-avatar-modern-vector-png-image_40962406.jpg",
@@ -29,3 +48,4 @@ const vehicleSchema = new mongoose.Schema({
 
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 export default Vehicle;
+

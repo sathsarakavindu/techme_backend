@@ -13,7 +13,7 @@ userRouter.post('/check-otp/', checkOTPValidation);
 
 userRouter.post('/change-password/', changePassword);
 
-userRouter.post('/update-forgot-password/', forgotPasswordUpdate);
+userRouter.put('/update-forgot-password/', forgotPasswordUpdate);
 
 userRouter.put('/update/', putUser);
 
