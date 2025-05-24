@@ -11,6 +11,22 @@ const helpSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    "vehicle_no": {
+        type: String,
+        required: true
+    },
+    "model":{
+        type: String,
+        required: true,
+    },
+    "type":{
+        type: String,
+        required: true,
+    },
+    "color":{
+        type: String,
+        required: true,
+    },
     "nic": {
          type: String,
          required: true

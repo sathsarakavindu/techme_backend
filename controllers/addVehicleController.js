@@ -59,7 +59,38 @@ await addVehicel.save()
 
 }
 
-export function getVehicles(req, res){
+export async function getVehicles(req, res){
+
+    try{
+       const nic = req.query.nic;
+console.log(nic);
+       await Vehicle.find({nic: nic}).
+       then(async (results)=>{
+        if(results != null){
+              res.status(200).json({
+               message: "Successfully founded vehicle.",
+               result: results
+              });
+        }
+        else{
+            res.json({
+               message: "No vehicles founded vehicle.",
+               result: results
+              });
+        }
+       }).
+       catch((error)=>{
+        res.status(500).json({
+            message: "Vehicle can't be founded.",
+            error: error
+        });
+       });
+
+}
+catch(e){
+
+
+}
 
 }
 
