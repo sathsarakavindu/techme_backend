@@ -4,12 +4,16 @@ export async function makeHelp(req, res){
 
     try{
 
-        const {user_name, email, nic, contact_no, address, latitude, longitude} = req.body;
+    const {user_name, email, vehicle_no, model, type, color, nic, contact_no, address, latitude, longitude} = req.body;
 
-      let help = new MakeHelp({
+    let help = new MakeHelp({
 
     user_name: user_name,
     email: email,
+    vehicle_no: vehicle_no,
+    model: model,
+    type: type,
+    color: color,
     nic: nic,
     contact_no: contact_no,
     address:address,
