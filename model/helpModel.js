@@ -11,6 +11,10 @@ const helpSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    "vehicle_image": {
+        type: String,
+        required: true
+    },
     "vehicle_no": {
         type: String,
         required: true
@@ -47,6 +51,11 @@ const helpSchema = mongoose.Schema({
     "longitude":{
         type: Number,
         required: true
+    },
+    "isApproved":{
+        required: true,
+        type: Boolean,
+        default: false
     },
     "isCompleted":{
         required: true,
