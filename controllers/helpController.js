@@ -62,5 +62,26 @@ export async function cancellMadeHelp(req, res){
             error: e
         });
     }
+    
 
+}
+
+export async function getMadeHelps(req, res){
+          try{
+
+            
+            await MakeHelp.find({isCancelled: false}).sort({createdAt: -1})
+            .then((results)=>{
+                res.status(200).json({
+                    message: "Successfully fetched helps.",
+                    results: results
+                });
+            })
+          }
+          catch(e){
+              res.status(500).json({
+                  message: "Can't be fetched helps.",
+                  error: e
+              });
+          }
 }
