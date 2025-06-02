@@ -7,7 +7,10 @@ import vehicleRouter from './routes/vehicleRoutes.js';
 import technicianRoute from './routes/technicianRoutes.js';
 import helpRouter from './routes/helpRoutes.js';
 
+
 const app = express();
+
+app.use(bodyParser.json());
 
 app.use(bodyParser.json());
 
