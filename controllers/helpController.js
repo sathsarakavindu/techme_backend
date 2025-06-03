@@ -65,7 +65,7 @@ export async function makeHelp(req, res) {
 
         const results = await help.save();
         
-        res.status(201).json({
+        res.status(200).json({
             message: "Successfully created help request.",
             help_id: results._id,
             results: results
@@ -334,3 +334,38 @@ export async function getHelpById(req, res) {
         });
     }
 }
+
+export async function helpApprove(req, res){
+
+      try{
+
+         const { help_id } = req.body;
+
+          await MakeHelp.findByIdAndUpdate(help_id, { isApproved: true }, { new: true })
+          .then((result) => {
+              if (!result) {
+                  return res.status(404).json({
+                      message: "Help request not found",
+                      error: "Not Found"
+                  });
+              }
+              res.status(200).json({
+                  message: "Successfully approved the help request.",
+                  result: result
+              });
+          });
+
+      }
+
+      catch(e){
+
+            console.error("Error approving help request:", e);
+            res.status(500).json({
+                message: "Failed to approve help request.",
+                error: e.message
+            });
+
+      }
+
+}
+
