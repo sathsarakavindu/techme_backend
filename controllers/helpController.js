@@ -34,17 +34,17 @@ export async function makeHelp(req, res) {
         }
 
         // Check if user already has an active help request
-        const existingHelp = await MakeHelp.findOne({
-            email: email,
-            isCancelled: false
-        });
+        // const existingHelp = await MakeHelp.findOne({
+        //     email: email,
+        //     isCancelled: false
+        // });
 
-        if (existingHelp) {
-            return res.status(409).json({
-                message: "You already have an active help request",
-                existing_help_id: existingHelp._id
-            });
-        }
+        // if (existingHelp) {
+        //     return res.status(409).json({
+        //         message: "You already have an active help request",
+        //         existing_help_id: existingHelp._id
+        //     });
+        // }
 
         let help = new MakeHelp({
             user_name: user_name,
