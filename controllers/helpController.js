@@ -369,3 +369,36 @@ export async function helpApprove(req, res){
 
 }
 
+export async function helpNotApprove(req, res){
+
+      try{
+
+         const { help_id } = req.body;
+
+          await MakeHelp.findByIdAndUpdate(help_id, { isApproved: false }, { new: true })
+          .then((result) => {
+              if (!result) {
+                  return res.status(404).json({
+                      message: "Help request not found",
+                      error: "Not Found"
+                  });
+              }
+              res.status(200).json({
+                  message: "Successfully not approved the request.",
+                  result: result
+              });
+          });
+
+      }
+
+      catch(e){
+
+            console.error("Error helpNotApprove request:", e);
+            res.status(500).json({
+                message: "Failed to not approved request.",
+                error: e.message
+            });
+
+      }
+
+}
