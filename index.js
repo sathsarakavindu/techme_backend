@@ -34,7 +34,10 @@ app.use('/api/vehicle', vehicleRouter);
 app.use('/api/users/help', helpRouter);
 app.use('/api/users/approval-help', approvalRouter);
 
-app.listen(5000, (req, res)=>{
-    console.log("Server is running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+
+app.listen(PORT, (req, res)=>{
+    console.log(`Server is running on port ${PORT}`);
 });
 
