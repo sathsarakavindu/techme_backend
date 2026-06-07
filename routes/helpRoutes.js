@@ -1,9 +1,18 @@
 import express from "express";
-import { cancellMadeHelp, makeHelp } from "../controllers/helpController.js";
+import { cancellMadeHelp, getHelpById, getMadeHelps, getUserHelps, helpApprove, helpNotApprove, makeHelp } from "../controllers/helpController.js";
 
 const helpRouter = express.Router();
 
 helpRouter.post('/make-help/', makeHelp);
 helpRouter.post('/cancel-help/', cancellMadeHelp);
+helpRouter.post('/approve-help/', helpApprove);
+helpRouter.post('/not-approve-help/', helpNotApprove);
+helpRouter.get('/get-helps/', getMadeHelps);
+// Get help requests by user email
+helpRouter.get('/user/:email', getUserHelps);
+
+// Get specific help request by ID
+helpRouter.get('/:help_id', getHelpById);
+
 
 export default helpRouter;

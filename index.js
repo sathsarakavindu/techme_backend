@@ -6,8 +6,12 @@ import 'dotenv/config'
 import vehicleRouter from './routes/vehicleRoutes.js';
 import technicianRoute from './routes/technicianRoutes.js';
 import helpRouter from './routes/helpRoutes.js';
+import approvalRouter from './routes/approvalRoutes.js';
+
 
 const app = express();
+
+app.use(bodyParser.json());
 
 app.use(bodyParser.json());
 
@@ -28,8 +32,12 @@ app.use('/api/users', userRouter);
 app.use('/api/technician', technicianRoute);
 app.use('/api/vehicle', vehicleRouter);
 app.use('/api/users/help', helpRouter);
+app.use('/api/users/approval-help', approvalRouter);
 
-app.listen(5000, (req, res)=>{
-    console.log("Server is running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+
+app.listen(PORT, (req, res)=>{
+    console.log(`Server is running on port ${PORT}`);
 });
 
