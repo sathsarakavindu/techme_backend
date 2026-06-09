@@ -60,7 +60,8 @@ export async function makeHelp(req, res) {
             latitude: latitude,
             longitude: longitude,
             isCancelled: false,
-            createdAt: new Date()
+            createdAt: new Date(),
+            updatedAt:new Date()
         });
 
         const results = await help.save();
@@ -148,7 +149,8 @@ export async function cancellMadeHelp(req, res) {
             make_help_id, 
             { 
                 isCancelled: true,
-                cancelledAt: new Date()
+                cancelledAt: new Date(),
+                updatedAt:new Date()
             }, 
             { new: true }
         );
