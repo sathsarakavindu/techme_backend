@@ -66,10 +66,6 @@ const helpSchema = mongoose.Schema({
         required: true,
         type: Boolean,
         default: false
-    },
-    "updatedAt":{
-        type:Date,
-        default:Date.now
     }
 });
 
