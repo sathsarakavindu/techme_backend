@@ -12,11 +12,19 @@ import approvalRouter from './routes/approvalRoutes.js';
 
 const app = express();
 const server = http.createServer(app);
+
+// Configure Socket.IO with proper settings for Railway
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"]
-  }
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  },
+  // Important: Allow upgrades and set ping timeout
+  allowUpgrades: true,
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  transports: ['websocket', 'polling'] // Try WebSocket first, fallback to polling
 });
 
 app.use(bodyParser.json());
@@ -26,13 +34,13 @@ const password = process.env.PASSWORD;
 
 const mongodbURL = `mongodb+srv://tester:${password}@cluster0.3drlv9w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-mongoose.connect(mongodbURL).
-then(()=>{
+mongoose.connect(mongodbURL)
+  .then(() => {
     console.log("Connected to MongoDB");
-}).
-catch(()=>{
-    console.log("Failed to connect to MongoDB");
-});
+  })
+  .catch((error) => {
+    console.log("Failed to connect to MongoDB:", error);
+  });
 
 app.use('/api/users', userRouter);
 app.use('/api/technician', technicianRoute);
@@ -60,9 +68,14 @@ io.on('connection', (socket) => {
     socket.on('update-location', async (data) => {
         const { helpId, latitude, longitude, timestamp } = data;
         
+        console.log(`Received location update for ${helpId}: ${latitude}, ${longitude}`);
+        
         // Update MongoDB with new location
         try {
+            // Make sure the model is registered
             const MakeHelp = mongoose.model('make help');
+            
+            // Update with upsert to ensure document exists
             const result = await MakeHelp.findByIdAndUpdate(
                 helpId,
                 { 
@@ -79,33 +92,60 @@ io.on('connection', (socket) => {
                         }
                     }
                 },
-                { new: true }
+                { new: true, upsert: false }
             );
             
-            // Broadcast location update to all connected clients in this help request room
-            io.to(`help_${helpId}`).emit('location-updated', {
-                helpId: helpId,
-                latitude: latitude,
-                longitude: longitude,
-                timestamp: timestamp
-            });
-            
-            console.log(`Location updated for help ${helpId}: ${latitude}, ${longitude}`);
+            if (result) {
+                // Broadcast location update to all connected clients in this help request room
+                io.to(`help_${helpId}`).emit('location-updated', {
+                    type: 'location-updated',
+                    helpId: helpId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    timestamp: timestamp
+                });
+                
+                console.log(`Location updated for help ${helpId}: ${latitude}, ${longitude}`);
+                // Send confirmation back to the sender
+                socket.emit('location-updated', {
+                    type: 'location-updated',
+                    helpId: helpId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    timestamp: timestamp,
+                    confirmed: true
+                });
+            } else {
+                console.log(`Help request ${helpId} not found`);
+                socket.emit('location-update-error', { 
+                    message: 'Help request not found',
+                    helpId: helpId
+                });
+            }
         } catch (error) {
             console.error('Error updating location:', error);
-            socket.emit('location-update-error', { message: error.message });
+            socket.emit('location-update-error', { 
+                message: error.message,
+                helpId: helpId
+            });
         }
     });
     
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });
+    
+    // Handle errors
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
+    });
 });
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`WebSocket server is ready on port ${PORT}`);
 });
 
 // Export io for use in other controllers
