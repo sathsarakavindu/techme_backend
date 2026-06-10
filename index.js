@@ -64,72 +64,51 @@ io.on('connection', (socket) => {
         console.log(`Socket ${socket.id} left room help_${helpId}`);
     });
     
-    // Handle location updates
-    socket.on('update-location', async (data) => {
-        const { helpId, latitude, longitude, timestamp } = data;
-        
-        console.log(`Received location update for ${helpId}: ${latitude}, ${longitude}`);
-        
-        // Update MongoDB with new location
-        try {
-            // Make sure the model is registered
-            const MakeHelp = mongoose.model('make help');
-            
-            // Update with upsert to ensure document exists
-            const result = await MakeHelp.findByIdAndUpdate(
-                helpId,
-                { 
-                    $set: { 
-                        latitude: latitude, 
-                        longitude: longitude,
-                        lastLocationUpdate: new Date(timestamp)
-                    },
-                    $push: {
-                        locationHistory: {
-                            latitude: latitude,
-                            longitude: longitude,
-                            timestamp: new Date(timestamp)
-                        }
-                    }
+    // In your socket.on('update-location') handler
+socket.on('update-location', async (data) => {
+    const { helpId, latitude, longitude, timestamp } = data;
+    
+    console.log(`📍 Location update received for ${helpId}: ${latitude}, ${longitude}`);
+    
+    // Update MongoDB
+    try {
+        const MakeHelp = mongoose.model('make help');
+        const result = await MakeHelp.findByIdAndUpdate(
+            helpId,
+            { 
+                $set: { 
+                    latitude: latitude, 
+                    longitude: longitude,
+                    lastLocationUpdate: new Date(timestamp)
                 },
-                { new: true, upsert: false }
-            );
-            
-            if (result) {
-                // Broadcast location update to all connected clients in this help request room
-                io.to(`help_${helpId}`).emit('location-updated', {
-                    type: 'location-updated',
-                    helpId: helpId,
-                    latitude: latitude,
-                    longitude: longitude,
-                    timestamp: timestamp
-                });
-                
-                console.log(`Location updated for help ${helpId}: ${latitude}, ${longitude}`);
-                // Send confirmation back to the sender
-                socket.emit('location-updated', {
-                    type: 'location-updated',
-                    helpId: helpId,
-                    latitude: latitude,
-                    longitude: longitude,
-                    timestamp: timestamp,
-                    confirmed: true
-                });
-            } else {
-                console.log(`Help request ${helpId} not found`);
-                socket.emit('location-update-error', { 
-                    message: 'Help request not found',
-                    helpId: helpId
-                });
-            }
-        } catch (error) {
-            console.error('Error updating location:', error);
-            socket.emit('location-update-error', { 
-                message: error.message,
-                helpId: helpId
+                $push: {
+                    locationHistory: {
+                        latitude: latitude,
+                        longitude: longitude,
+                        timestamp: new Date(timestamp)
+                    }
+                }
+            },
+            { new: true }
+        );
+        
+        if (result) {
+            console.log(`✅ Database updated for help ${helpId}`);
+            // Send confirmation back
+            socket.emit('location-updated', {
+                type: 'location-updated',
+                helpId: helpId,
+                latitude: latitude,
+                longitude: longitude,
+                confirmed: true
             });
+        } else {
+            console.log(`❌ Help request ${helpId} not found`);
         }
-    });
+    } catch (error) {
+        console.error('Error updating location:', error);
+    }
+});
     
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
