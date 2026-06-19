@@ -177,11 +177,10 @@ export async function sentOTPToUser(req, res){
        if(user != null){
 
       const transporter = nodemailer.createTransport({
-    //   service: "gmail",  
+      service: "gmail",  
     //   host: "smtp.ethereal.email",
-     host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // true for 465, false for other ports
+    //   port: 587,
+     // secure: false, // true for 465, false for other ports
       auth: {
              user: process.env.SERVICE_EMAIL,
              pass: process.env.SERVICE_EMAIL_PASSWORD,
