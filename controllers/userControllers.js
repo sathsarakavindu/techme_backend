@@ -276,12 +276,12 @@ export async function sentOTPToUser(req, res) {
 
     const transporter =
       nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
+        host: "smtp-relay.brevo.com",//"smtp.gmail.com",
+        port: 587,//465,
+        secure: false,//true,
         auth: {
-          user: process.env.SERVICE_EMAIL,
-          pass: process.env.SERVICE_EMAIL_PASSWORD,
+          user: process.env.BREVO_SMTP_LOGIN,//process.env.SERVICE_EMAIL,
+          pass: process.env.BREVO_SMTP_KEY, //process.env.SERVICE_EMAIL_PASSWORD,
         },
       });
 
@@ -296,7 +296,7 @@ export async function sentOTPToUser(req, res) {
 
     const info =
       await transporter.sendMail({
-        from: process.env.SERVICE_EMAIL,
+        from: process.env.BREVO_SENDER_EMAIL,//process.env.SERVICE_EMAIL,
         to: registered_email,
         subject: "Validate OTP",
         text: `Your OTP code is ${otp}`,
