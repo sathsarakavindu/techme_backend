@@ -205,11 +205,11 @@ const transporter = nodemailer.createTransport({
                    text: "Your OTP code is " + otp
           }
 
-          await transporter.verify();
+           transporter.verify();
 
 console.log("SMTP Connected");
 
-      await transporter.sendMail(message, (err, info)=>{
+       transporter.sendMail(message, (err, info)=>{
 
       if(err){
         console.log(err);
