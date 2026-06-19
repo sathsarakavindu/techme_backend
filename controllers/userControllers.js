@@ -166,6 +166,7 @@ export async function putUser(req, res){
     });
 }   
 
+/*
 export async function sentOTPToUser(req, res){
 
   const {registered_email} = req.body;
@@ -256,6 +257,74 @@ console.log("SMTP Connected");
       });
   }
 
+}
+*/
+
+export async function sentOTPToUser(req, res) {
+  try {
+    const { registered_email } = req.body;
+
+    const user = await User.findOne({
+      email: registered_email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid Email",
+      });
+    }
+
+    const transporter =
+      nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.SERVICE_EMAIL,
+          pass: process.env.SERVICE_EMAIL_PASSWORD,
+        },
+      });
+
+    await transporter.verify();
+
+    console.log("SMTP Connected");
+
+    const otp =
+      Math.floor(
+        1000 + Math.random() * 9000
+      );
+
+    const info =
+      await transporter.sendMail({
+        from: process.env.SERVICE_EMAIL,
+        to: registered_email,
+        subject: "Validate OTP",
+        text: `Your OTP code is ${otp}`,
+      });
+
+    console.log(info);
+
+    const result =
+      await User.findOneAndUpdate(
+        { email: registered_email },
+        { otp },
+        { new: true }
+      );
+
+    return res.status(200).json({
+      message: "OTP sent successfully",
+      result,
+    });
+
+  } catch (e) {
+
+    console.log("MAIL ERROR:", e);
+
+    return res.status(500).json({
+      message: "OTP can't be sent!",
+      error: e.message,
+    });
+  }
 }
 
 export async function checkOTPValidation(req, res){
