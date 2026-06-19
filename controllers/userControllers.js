@@ -188,13 +188,15 @@ export async function sentOTPToUser(req, res){
     //   });
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SERVICE_EMAIL,
     pass: process.env.SERVICE_EMAIL_PASSWORD,
   },
 });
-
+    
      const otp = Math.floor(1000 + Math.random() * 9000);
        const message = {
                    from: process.env.EMAIL,
@@ -203,7 +205,11 @@ const transporter = nodemailer.createTransport({
                    text: "Your OTP code is " + otp
           }
 
-       transporter.sendMail(message, (err, info)=>{
+          await transporter.verify();
+
+console.log("SMTP Connected");
+
+      await transporter.sendMail(message, (err, info)=>{
 
       if(err){
         console.log(err);
