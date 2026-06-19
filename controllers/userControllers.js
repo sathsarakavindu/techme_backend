@@ -176,16 +176,25 @@ export async function sentOTPToUser(req, res){
   then((user)=>{
        if(user != null){
 
-      const transporter = nodemailer.createTransport({
-      service: "gmail",  
+    //   const transporter = nodemailer.createTransport({
+    //   service: "gmail",  
     //   host: "smtp.ethereal.email",
     //   port: 587,
-     // secure: false, // true for 465, false for other ports
-      auth: {
-             user: process.env.SERVICE_EMAIL,
-             pass: process.env.SERVICE_EMAIL_PASSWORD,
-            },
-      });
+    //   secure: false, // true for 465, false for other ports
+    //   auth: {
+    //          user: process.env.SERVICE_EMAIL,
+    //          pass: process.env.SERVICE_EMAIL_PASSWORD,
+    //         },
+    //   });
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SERVICE_EMAIL,
+    pass: process.env.SERVICE_EMAIL_PASSWORD,
+  },
+});
+
      const otp = Math.floor(1000 + Math.random() * 9000);
        const message = {
                    from: process.env.EMAIL,
