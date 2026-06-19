@@ -4,8 +4,6 @@ import bcryptjs from "bcryptjs";
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import axios from "axios";
-
 
 dotenv.config();
 
@@ -168,7 +166,6 @@ export async function putUser(req, res){
     });
 }   
 
-/*
 export async function sentOTPToUser(req, res){
 
   const {registered_email} = req.body;
@@ -179,27 +176,16 @@ export async function sentOTPToUser(req, res){
   then((user)=>{
        if(user != null){
 
-    //   const transporter = nodemailer.createTransport({
-    //   service: "gmail",  
-    //   host: "smtp.ethereal.email",
-    //   port: 587,
-    //   secure: false, // true for 465, false for other ports
-    //   auth: {
-    //          user: process.env.SERVICE_EMAIL,
-    //          pass: process.env.SERVICE_EMAIL_PASSWORD,
-    //         },
-    //   });
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.SERVICE_EMAIL,
-    pass: process.env.SERVICE_EMAIL_PASSWORD,
-  },
-});
-    
+      const transporter = nodemailer.createTransport({
+      service: "gmail",  
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+             user: process.env.SERVICE_EMAIL,
+             pass: process.env.SERVICE_EMAIL_PASSWORD,
+            },
+      });
      const otp = Math.floor(1000 + Math.random() * 9000);
        const message = {
                    from: process.env.EMAIL,
@@ -207,10 +193,6 @@ const transporter = nodemailer.createTransport({
                    subject: "Validate OTP",
                    text: "Your OTP code is " + otp
           }
-
-           transporter.verify();
-
-console.log("SMTP Connected");
 
        transporter.sendMail(message, (err, info)=>{
 
@@ -260,120 +242,6 @@ console.log("SMTP Connected");
   }
 
 }
-*/
-
-
-
-export async function sentOTPToUser(req, res) {
-  try {
-    const { registered_email } = req.body;
-
-    const user = await User.findOne({ email: registered_email });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid Email" });
-    }
-
-    const otp = Math.floor(1000 + Math.random() * 9000);
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false, // important for 587
-      auth: {
-        user: process.env.BREVO_SMTP_LOGIN,   // usually your Brevo login email
-        pass: process.env.BREVO_API_KEY,     // SMTP key (not password)
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"My App" <${process.env.BREVO_SENDER_EMAIL}>`,
-      to: registered_email,
-      subject: "Validate OTP",
-      text: `Your OTP code is ${otp}`,
-    });
-
-    console.log("Email sent:", info.messageId);
-
-    await User.findOneAndUpdate(
-      { email: registered_email },
-      { otp },
-      { new: true }
-    );
-
-    return res.status(200).json({
-      message: "OTP sent successfully",
-    });
-
-  } catch (e) {
-    console.log("MAIL ERROR:", e);
-
-    return res.status(500).json({
-      message: "OTP can't be sent!",
-      error: e.message,
-    });
-  }
-}
-
-
-// export async function sentOTPToUser(req, res) {
-//   try {
-//     const { registered_email } = req.body;
-
-//     const user = await User.findOne({ email: registered_email });
-
-//     if (!user) {
-//       return res.status(400).json({
-//         message: "Invalid Email",
-//       });
-//     }
-
-//     const otp = Math.floor(1000 + Math.random() * 9000);
-
-//     const response = await axios.post(
-//       "https://api.brevo.com/v3/smtp/email",
-//       {
-//         sender: {
-//           name: "My App",
-//           email: process.env.BREVO_SENDER_EMAIL,
-//         },
-//         to: [
-//           {
-//             email: registered_email,
-//           },
-//         ],
-//         subject: "Validate OTP",
-//         textContent: `Your OTP code is ${otp}`,
-//       },
-//       {
-//         headers: {
-//           "api-key": process.env.BREVO_API_KEY, //BREVO_API_KEY
-//           "content-type": "application/json",
-//         },
-//       }
-//     );
-
-//     console.log("Email sent:", response.data);
-
-//     await User.findOneAndUpdate(
-//       { email: registered_email },
-//       { otp },
-//       { new: true }
-//     );
-
-//     return res.status(200).json({
-//       message: "OTP sent successfully",
-//     });
-
-//   } catch (e) {
-//     console.log("MAIL ERROR:", e.response?.data || e.message);
-
-//     return res.status(500).json({
-//       message: "OTP can't be sent!",
-//       error: e.message,
-//     });
-//   }
-// }
 
 export async function checkOTPValidation(req, res){
 
