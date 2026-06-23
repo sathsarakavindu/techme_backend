@@ -94,12 +94,30 @@ catch(e){
 
 }
 
-export function updateVehicle(req, res){
+export async function updateVehicle(req, res){
 
 }
 
-export function deleteVehicle(req, res){   
+export async function deleteVehicle(req, res){   
 
+    try{
+
+        const vehicleNo = req.query.vehicle_no;
+        await Vehicle.findOneAndDelete({vehicle_no:vehicleNo}).then((result) => {
+if(result){
+    res.status(200).json({message:"Vehicle was Deleted Successfully!", result:result});
+}
+else{
+    res.status(404).json({message:"No vehicle found."})
+}
+        }).catch((error) => {
+     res.status(404).json({error:error});
+        });
+
+    }
+    catch(error){
+       console.log(`The error is in deleteVehicle: ${error}`);
+    }
 }
 
 export async function isAvailableThisVehicle(req, res){
