@@ -101,3 +101,27 @@ export function updateVehicle(req, res){
 export function deleteVehicle(req, res){   
 
 }
+
+export async function isAvailableThisVehicle(req, res){
+
+    try{
+const vehicleNo = req.query.vehicle_no;
+await Vehicle.findOne({vehicle_no: vehicleNo}).then( async (result)=>{
+if(result != null){
+res.status(200).json({
+message:"This vehicle has already been registered!",
+result:result
+});
+}else{
+    res.json({message:""})
+}
+
+}).catch((error)=>{
+
+    res.status(404).json({message:"This vehicle can't be found"})
+});
+    }
+    catch(error){
+ console.log(`The error is in isAvailableThisVehicle: ${error}`);
+    }
+}

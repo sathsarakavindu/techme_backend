@@ -1,11 +1,12 @@
 import express from 'express';
-import { addVehicle, deleteVehicle, getVehicles, updateVehicle } from '../controllers/addVehicleController.js';
+import { addVehicle, deleteVehicle, getVehicles, isAvailableThisVehicle, updateVehicle } from '../controllers/addVehicleController.js';
 
 const vehicleRouter = express.Router();
 
 vehicleRouter.post('/add-vehicle/', addVehicle);
 
 vehicleRouter.get('/get-vehicle/', getVehicles);
+vehicleRouter.get('/is-vehicle-available', isAvailableThisVehicle);
 
 vehicleRouter.put('/edit-vehicle', updateVehicle);
 
