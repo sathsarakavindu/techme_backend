@@ -48,7 +48,7 @@ app.use('/api/vehicle', vehicleRouter);
 app.use('/api/users/help', helpRouter);
 app.use('/api/users/approval-help', approvalRouter);
 
-// WebSocket connection handling
+// In your server file, update the WebSocket handling
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
     
@@ -64,61 +64,201 @@ io.on('connection', (socket) => {
         console.log(`Socket ${socket.id} left room help_${helpId}`);
     });
     
-    // In your socket.on('update-location') handler
-socket.on('update-location', async (data) => {
-    const { helpId, latitude, longitude, timestamp } = data;
-    
-    console.log(`📍 Location update received for ${helpId}: ${latitude}, ${longitude}`);
-    
-    // Update MongoDB
-    try {
-        const MakeHelp = mongoose.model('make help');
-        const result = await MakeHelp.findByIdAndUpdate(
-            helpId,
-            { 
-                $set: { 
-                    latitude: latitude, 
-                    longitude: longitude,
-                    lastLocationUpdate: new Date(timestamp)
-                },
-                $push: {
-                    locationHistory: {
-                        latitude: latitude,
-                        longitude: longitude,
-                        timestamp: new Date(timestamp)
-                    }
-                }
-            },
-            { new: true }
-        );
+    // Update location handler
+    socket.on('update-location', async (data) => {
+        const { helpId, latitude, longitude, timestamp } = data;
         
-        if (result) {
-            console.log(`✅ Database updated for help ${helpId}`);
-            // Send confirmation back
+        console.log(`📍 Location update received for ${helpId}: ${latitude}, ${longitude}`);
+        
+        // Validate data
+        if (!helpId || typeof latitude !== 'number' || typeof longitude !== 'number') {
+            console.error('Invalid location data received');
             socket.emit('location-updated', {
                 type: 'location-updated',
                 helpId: helpId,
-                latitude: latitude,
-                longitude: longitude,
-                confirmed: true
+                error: 'Invalid data',
+                confirmed: false
             });
-        } else {
-            console.log(`❌ Help request ${helpId} not found`);
+            return;
         }
-    } catch (error) {
-        console.error('Error updating location:', error);
-    }
-});
+        
+        // Update MongoDB
+        try {
+            const MakeHelp = mongoose.model('make help');
+            const result = await MakeHelp.findByIdAndUpdate(
+                helpId,
+                { 
+                    $set: { 
+                        latitude: latitude, 
+                        longitude: longitude,
+                        lastLocationUpdate: new Date(timestamp)
+                    },
+                    $push: {
+                        locationHistory: {
+                            latitude: latitude,
+                            longitude: longitude,
+                            timestamp: new Date(timestamp)
+                        }
+                    }
+                },
+                { new: true }
+            );
+            
+            if (result) {
+                console.log(`✅ Database updated for help ${helpId}`);
+                // Broadcast to all clients in the room
+                io.to(`help_${helpId}`).emit('location-updated', {
+                    type: 'location-updated',
+                    helpId: helpId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    timestamp: timestamp,
+                    confirmed: true
+                });
+            } else {
+                console.log(`❌ Help request ${helpId} not found`);
+                socket.emit('location-updated', {
+                    type: 'location-updated',
+                    helpId: helpId,
+                    error: 'Help request not found',
+                    confirmed: false
+                });
+            }
+        } catch (error) {
+            console.error('Error updating location:', error);
+            socket.emit('location-updated', {
+                type: 'location-updated',
+                helpId: helpId,
+                error: 'Database error',
+                confirmed: false
+            });
+        }
+    });
     
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });
     
-    // Handle errors
     socket.on('error', (error) => {
         console.error('Socket error:', error);
     });
 });
+
+
+// WebSocket connection handling
+// io.on('connection', (socket) => {
+//     console.log('New client connected:', socket.id);
+    
+//     // Join a specific help request room
+//     socket.on('join-help-room', (helpId) => {
+//         socket.join(`help_${helpId}`);
+//         console.log(`Socket ${socket.id} joined room help_${helpId}`);
+//     });
+    
+//     // Leave help request room
+//     socket.on('leave-help-room', (helpId) => {
+//         socket.leave(`help_${helpId}`);
+//         console.log(`Socket ${socket.id} left room help_${helpId}`);
+//     });
+    
+//     // In your socket.on('update-location') handler
+// socket.on("update-location", async (data) => {
+//     const { helpId, latitude, longitude } = data;
+
+//     if (!helpId || !latitude || !longitude) {
+//         console.log("❌ Invalid data received:", data);
+//         return;
+//     }
+
+//     console.log(`📍 Location update received for ${helpId}: ${latitude}, ${longitude}`);
+
+//     try {
+//         const result = await MakeHelp.findByIdAndUpdate(
+//             helpId,
+//             {
+//                 $set: {
+//                     latitude,
+//                     longitude,
+//                     lastLocationUpdate: new Date()
+//                 },
+//                 $push: {
+//                     locationHistory: {
+//                         latitude,
+//                         longitude,
+//                         timestamp: new Date()
+//                     }
+//                 }
+//             },
+//             { new: true }
+//         );
+
+//         if (!result) {
+//             console.log("❌ Help not found:", helpId);
+//         }
+
+//     } catch (error) {
+//         console.error("Error updating location:", error);
+//     }
+// });
+
+
+
+// /*
+//     socket.on('update-location', async (data) => {
+//     const { helpId, latitude, longitude, timestamp } = data;
+    
+//     console.log(`📍 Location update received for ${helpId}: ${latitude}, ${longitude}`);
+    
+//     // Update MongoDB
+//     try {
+//         const MakeHelp = mongoose.model('make help');
+//         const result = await MakeHelp.findByIdAndUpdate(
+//             helpId,
+//             { 
+//                 $set: { 
+//                     latitude: latitude, 
+//                     longitude: longitude,
+//                     lastLocationUpdate: new Date(timestamp)
+//                 },
+//                 $push: {
+//                     locationHistory: {
+//                         latitude: latitude,
+//                         longitude: longitude,
+//                         timestamp: new Date(timestamp)
+//                     }
+//                 }
+//             },
+//             { new: true }
+//         );
+        
+//         if (result) {
+//             console.log(`✅ Database updated for help ${helpId}`);
+//             // Send confirmation back
+//             socket.emit('location-updated', {
+//                 type: 'location-updated',
+//                 helpId: helpId,
+//                 latitude: latitude,
+//                 longitude: longitude,
+//                 confirmed: true
+//             });
+//         } else {
+//             console.log(`❌ Help request ${helpId} not found`);
+//         }
+//     } catch (error) {
+//         console.error('Error updating location:', error);
+//     }
+// });
+// */
+    
+//     socket.on('disconnect', () => {
+//         console.log('Client disconnected:', socket.id);
+//     });
+    
+//     // Handle errors
+//     socket.on('error', (error) => {
+//         console.error('Socket error:', error);
+//     });
+// });
 
 const PORT = process.env.PORT || 5000;
 
