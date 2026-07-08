@@ -9,6 +9,7 @@ import vehicleRouter from './routes/vehicleRoutes.js';
 import technicianRoute from './routes/technicianRoutes.js';
 import helpRouter from './routes/helpRoutes.js';
 import approvalRouter from './routes/approvalRoutes.js';
+import cors from 'cors';
 
 const app = express();
 const server = http.createServer(app); // Single server that handle both HTTP and WebSocket traffic.
@@ -26,6 +27,11 @@ const io = new Server(server, {
   pingInterval: 25000,
   transports: ['websocket', 'polling'] // Try WebSocket first, fallback to polling
 });
+
+app.use(cors({
+    origin:"*",
+    methods:["GET","POST","PUT","DELETE"]
+}));
 
 app.use(bodyParser.json());
 
