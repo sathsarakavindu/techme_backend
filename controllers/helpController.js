@@ -161,7 +161,7 @@ export async function cancellMadeHelp(req, res) {
         }
 
         res.status(200).json({
-            message: "Successfully cancelled the help request.",
+            message: "Help Request Successfully Cancelled.",
             result: result
         });
 

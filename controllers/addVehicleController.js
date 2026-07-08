@@ -96,6 +96,31 @@ catch(e){
 
 export async function updateVehicle(req, res){
 
+try{
+    const {_id, vehicle_no, type, model, color} = req.body;
+    console.log(_id);
+    console.log(vehicle_no);
+    console.log(type);
+    console.log(model);
+    
+   const updatedVehicle = await Vehicle.findByIdAndUpdate(_id,{
+        vehicle_no, 
+        type, 
+        model, 
+        color
+    },{new:true});
+
+    console.log("Updated vehicle is ", updateVehicle);
+
+    res.status(200).json({message:"Vehicle updated", result: updatedVehicle});
+
+}
+catch(error){
+console.log("Error in updateVehicle: ", error);
+}
+
+
+
 }
 
 export async function deleteVehicle(req, res){   
