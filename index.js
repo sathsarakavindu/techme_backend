@@ -139,6 +139,40 @@ io.on('connection', (socket) => {
             });
         }
     });
+
+    // Getting Help List
+socket.on('get-help-list', async (data) => {
+
+    try {
+
+        const MakeHelp = mongoose.model('make help');
+
+        const helpList = await MakeHelp.find({
+            isCancelled: false,
+            isCompleted: false,
+            isApproved: false
+        });
+
+        socket.emit('got-help-list', {
+            type: 'got-help-list',
+            helpList: helpList,
+            confirmed: true
+        });
+
+        console.log(`✅ Found ${helpList.length} help requests`);
+
+    } catch (error) {
+
+        console.error("Error getting help list:", error);
+
+        socket.emit('got-help-list', {
+            type: 'got-help-list',
+            error: 'Database error',
+            confirmed: false
+        });
+    }
+
+});
     
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);

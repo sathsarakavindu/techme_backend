@@ -199,7 +199,7 @@ export async function cancellMadeHelp(req, res){
 
 }
 */
-
+/*
 export async function getMadeHelps(req, res) {
     try {
         // Get query parameters for filtering
@@ -247,8 +247,9 @@ export async function getMadeHelps(req, res) {
         });
     }
 }
+*/
 
-/*
+
 export async function getMadeHelps(req, res){
           try{
 
@@ -268,7 +269,7 @@ export async function getMadeHelps(req, res){
               });
           }
 }
-*/
+
 
 // New endpoint to get help requests by user email
 export async function getUserHelps(req, res) {
