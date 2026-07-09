@@ -108,6 +108,17 @@ io.on('connection', (socket) => {
                 },
                 { new: true }
             );
+
+    const helpList = await MakeHelp.find({
+      isCancelled: false,
+      isCompleted: false,
+      isApproved: false
+    });
+
+    io.emit("got-help-list", {
+    confirmed: true,
+    helpList
+    });
             
             if (result) {
                 console.log(`✅ Database updated for help ${helpId}`);
