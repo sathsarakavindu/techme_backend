@@ -108,6 +108,7 @@ io.on('connection', (socket) => {
                 },
                 { new: true }
             );
+
             
             if (result) {
                 console.log(`✅ Database updated for help ${helpId}`);
